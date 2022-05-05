@@ -219,27 +219,27 @@ dataSources:
           filter:
             topics:
               - ServiceAgreementCreated(address indexed consumer, address indexed indexer, bytes32 indexed deploymentId, address serviceAgreement)
-  - <<: *frontier
-    processor:
-      <<: *frontier-processor
-      options:
-        abi: rewardsDistributor
-        address: '0xA500a3ad54223B7E18D7d73da34f2EF06aCa77eC'
-    mapping:
-      file: ./dist/index.js
-      handlers:
-        - handler: handleRewardsDistributed
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - DistributeRewards(address indexed indexer, uint256 indexed eraIdx)
-        - handler: handleRewardsClaimed
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - ClaimRewards(address indexed indexer, address indexed delegator, uint256 rewards)
-        - handler: handleRewardsUpdated
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - RewardsChanged(address indexed indexer, uint256 indexed eraIdx, uint256 additions, uint256 removals)
+  # - <<: *frontier
+  #   processor:
+  #     <<: *frontier-processor
+  #     options:
+  #       abi: rewardsDistributor
+  #       address: '0xA500a3ad54223B7E18D7d73da34f2EF06aCa77eC'
+  #   mapping:
+  #     file: ./dist/index.js
+  #     handlers:
+  #       - handler: handleRewardsDistributed
+  #         kind: substrate/FrontierEvmEvent
+  #         filter:
+  #           topics:
+  #             - DistributeRewards(address indexed indexer, uint256 indexed eraIdx)
+  #       - handler: handleRewardsClaimed
+  #         kind: substrate/FrontierEvmEvent
+  #         filter:
+  #           topics:
+  #             - ClaimRewards(address indexed indexer, address indexed delegator, uint256 rewards)
+  #       - handler: handleRewardsUpdated
+  #         kind: substrate/FrontierEvmEvent
+  #         filter:
+  #           topics:
+  #             - RewardsChanged(address indexed indexer, uint256 indexed eraIdx, uint256 additions, uint256 removals)
