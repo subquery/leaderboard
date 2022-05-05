@@ -62,10 +62,11 @@ export async function handlePlanTemplateMetadataUpdated(
   const id = event.args.planTemplateId.toHexString();
 
   const planTemplate = await PlanTemplate.get(id);
-  assert(planTemplate, `Plan template not found. templateId="${id}"`);
-  planTemplate.metadata = bytesToIpfsCid(event.args.metadata);
 
-  await planTemplate.save();
+  if(planTemplate){
+    planTemplate.metadata = bytesToIpfsCid(event.args.metadata);
+    await planTemplate.save();
+  }
 }
 
 export async function handlePlanTemplateStatusUpdated(
@@ -76,11 +77,12 @@ export async function handlePlanTemplateStatusUpdated(
 
   const id = event.args.planTemplateId.toHexString();
   const planTemplate = await PlanTemplate.get(id);
-  assert(planTemplate, `Plan template not found. templateId="${id}"`);
 
-  planTemplate.active = event.args.active;
+  if(planTemplate){
+    planTemplate.active = event.args.active;
+    await planTemplate.save();
+  }
 
-  await planTemplate.save();
 }
 
 export async function handlePlanCreated(

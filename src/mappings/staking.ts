@@ -166,11 +166,11 @@ export async function handleWithdrawClaimed(
   const id = getWithdrawlId(source, index);
 
   const withdrawl = await Withdrawl.get(id);
-  assert(withdrawl, `Expected withdrawl (${id}) to exist`);
 
-  withdrawl.claimed = true;
-
-  await withdrawl.save();
+  if(withdrawl){
+    withdrawl.claimed = true;
+    await withdrawl.save();
+  }
 }
 
 export async function handleSetCommissionRate(
