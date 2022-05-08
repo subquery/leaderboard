@@ -27,7 +27,7 @@ x-frontier-s1: &frontier-s1
 
 x-frontier: &frontier
   kind: substrate/FrontierEvm
-  startBlock: 176345 # Season 2 start block
+  startBlock: 164125 # Season 2 start block
   processor: &frontier-processor
     file: './dist/frontierEvm.js'
   assets:
