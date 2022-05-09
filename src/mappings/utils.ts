@@ -2,7 +2,7 @@ import bs58 from 'bs58';
 import { BigNumber } from '@ethersproject/bignumber';
 import { EraManager } from '@subql/contract-sdk';
 import { Delegator, Indexer, EraValue, JSONBigInt } from '../types';
-
+import assert from 'assert';
 import testnetAddresses from '@subql/contract-sdk/publish/testnet.json';
 
 interface Challenge_Pts {
@@ -21,7 +21,17 @@ export const CHALLENGES_PTS: Challenge_Pts = {
   DEFAULT_PLAN: 50,
   OVERRIDE_PLAN: 50,
   SERVICE_AGREEMENT: 50,
+  //new challenges
+  CLAIM_REWARD: 20,
+  INDEXER_UNDELEGATED: 20,
+  WITHDRAW_CLAIMED: 50,
 };
+
+//TODO: DELEGATOR CHALLENGES
+//CLAIM_REWARD: 20,
+//WITHDRAW_CLAIMED: 50,
+//REDELEGATE_INDEXER: 50,
+//UNDELEGATE_INDEXER: 50
 
 export const CHALLENGES_DETAILS: Challenge_Details = {
   INDEX_SINGLE: 'Fully index a project from demo projects list',
@@ -31,6 +41,7 @@ export const CHALLENGES_DETAILS: Challenge_Details = {
   DEFAULT_PLAN: 'Create a default plan',
   OVERRIDE_PLAN: 'Create a override plan',
   SERVICE_AGREEMENT: 'Create a service aggreement',
+  CLAIM_REWARD: 'Indexer claims a reward',
 };
 
 // IPFS HASH of deployments
@@ -224,7 +235,7 @@ export async function updateChallengeStatus(
   logger.info(`updateChallengeStatus: ${indexerAddress}, ${challengeType} `);
 
   if (!indexerRecord) {
-    logger.error('cannot find, no indexer to update');
+    logger.warn(`cannot find indexer to add challenge`);
     return;
   }
 

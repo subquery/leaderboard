@@ -16,7 +16,7 @@ import {
   DistributeRewardsEvent,
   RewardsChangedEvent,
 } from '@subql/contract-sdk/typechain/RewardsDistributer';
-import { REWARD_DIST_ADDRESS } from './utils';
+import { REWARD_DIST_ADDRESS, updateChallengeStatus } from './utils';
 import { FrontierEvmEvent } from '@subql/contract-processors/dist/frontierEvm';
 import { BigNumber } from '@ethersproject/bignumber';
 
@@ -100,8 +100,7 @@ export async function handleRewardsClaimed(
   });
 
   await reward.save();
-
-  // throw new Error('DONE')
+  await updateChallengeStatus(event.args.indexer, 'CLAIM_REWARD');
 }
 
 export async function handleRewardsUpdated(

@@ -37,13 +37,6 @@ export async function handleAddDelegation(
   assert(event.args, 'No event args');
 
   const { source, indexer, amount } = event.args;
-  const indexerEntity = await Indexer.get(indexer);
-
-  if (!indexerEntity) {
-    logger.warn(`indexer (${indexer}) could not be found`);
-    return;
-  }
-
   const id = getDelegationId(source, indexer);
   const eraManager = EraManager__factory.connect(
     ERA_MANAGER_ADDRESS,
@@ -131,6 +124,7 @@ export async function handleRemoveDelegation(
   await updateTotalStake(eraManager, indexer, amount.toBigInt(), 'sub');
 
   await delegation.save();
+  await updateChallengeStatus(delegation.indexerId, 'INDEXER_UNDELEGATED');
 }
 
 /* TODO wait for new contracts */
@@ -166,11 +160,12 @@ export async function handleWithdrawClaimed(
   const id = getWithdrawlId(source, index);
 
   const withdrawl = await Withdrawl.get(id);
+  assert(withdrawl, `Expected withdrawl (${id}) to exist`);
 
-  if(withdrawl){
-    withdrawl.claimed = true;
-    await withdrawl.save();
-  }
+  withdrawl.claimed = true;
+
+  await withdrawl.save();
+  await updateChallengeStatus(withdrawl.indexer, 'WITHDRAW_CLAIMED');
 }
 
 export async function handleSetCommissionRate(
@@ -186,11 +181,7 @@ export async function handleSetCommissionRate(
   );
 
   const indexer = await Indexer.get(address);
-
-  if (!indexer) {
-    logger.warn(`indexer (${address}) could not be found`);
-    return;
-  }
+  assert(indexer, `Expected indexer (${address}) to exist`);
 
   const newCommission = await upsertEraValue(
     eraManager,
@@ -206,6 +197,5 @@ export async function handleSetCommissionRate(
   }
 
   indexer.commission = newCommission;
-
   await indexer.save();
 }

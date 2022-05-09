@@ -22,7 +22,6 @@ export async function handleRegisterIndexer(
   logger.info('handleRegisterIndexer');
   assert(event.args, 'No event args');
   const { indexer: indexerAddress, metadata } = event.args;
-  logger.info(indexerAddress);
 
   let indexer = await Indexer.get(indexerAddress);
   const eraManager = EraManager__factory.connect(
@@ -50,6 +49,7 @@ export async function handleRegisterIndexer(
     demoProjectsIndexed: [],
     singleChallenges: [],
   });
+
   await indexer.save();
 }
 
