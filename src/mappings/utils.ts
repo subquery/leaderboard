@@ -2,7 +2,6 @@ import bs58 from 'bs58';
 import { BigNumber } from '@ethersproject/bignumber';
 import { EraManager } from '@subql/contract-sdk';
 import { Delegator, Indexer, EraValue, JSONBigInt } from '../types';
-import assert from 'assert';
 import testnetAddresses from '@subql/contract-sdk/publish/testnet.json';
 
 interface Challenge_Pts {
@@ -41,7 +40,10 @@ export const CHALLENGES_DETAILS: Challenge_Details = {
   DEFAULT_PLAN: 'Create a default plan',
   OVERRIDE_PLAN: 'Create a override plan',
   SERVICE_AGREEMENT: 'Create a service aggreement',
+  //new challenges
   CLAIM_REWARD: 'Indexer claims a reward',
+  INDEXER_UNDELEGATED: 'Indexer remove delegation to itself',
+  WITHDRAW_CLAIMED: 'Indexer withdraws unstaked amount',
 };
 
 // IPFS HASH of deployments
