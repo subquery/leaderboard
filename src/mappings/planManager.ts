@@ -9,7 +9,7 @@ import {
 import {
   bytesToIpfsCid,
   PLAN_MANAGER_ADDRESS,
-  updateChallengeStatus,
+  updateIndexerChallenges,
 } from './utils';
 import { constants } from 'ethers';
 
@@ -102,9 +102,9 @@ export async function handlePlanCreated(
   });
 
   if (plan.deploymentId) {
-    await updateChallengeStatus(event.args.creator, 'OVERRIDE_PLAN');
+    await updateIndexerChallenges(event.args.creator, 'OVERRIDE_PLAN');
   } else {
-    await updateChallengeStatus(event.args.creator, 'DEFAULT_PLAN');
+    await updateIndexerChallenges(event.args.creator, 'DEFAULT_PLAN');
   }
 
   await plan.save();

@@ -4,7 +4,7 @@
 import assert from 'assert';
 import { ServiceAgreementCreatedEvent } from '@subql/contract-sdk/typechain/ServiceAgreementRegistry';
 import { ServiceAgreement } from '../types';
-import { bytesToIpfsCid, updateChallengeStatus } from './utils';
+import { bytesToIpfsCid, updateIndexerChallenges } from './utils';
 import { IServiceAgreement__factory } from '@subql/contract-sdk';
 import FrontierEthProvider from './ethProvider';
 import { FrontierEvmEvent } from '@subql/contract-processors/dist/frontierEvm';
@@ -41,5 +41,5 @@ export async function handleServiceAgreementCreated(
   });
 
   await sa.save();
-  await updateChallengeStatus(event.args.indexer, 'SERVICE_AGREEMENT');
+  await updateIndexerChallenges(event.args.indexer, 'SERVICE_AGREEMENT');
 }

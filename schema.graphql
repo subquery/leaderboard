@@ -36,8 +36,6 @@ type DeploymentIndexer @entity {
   mmrRoot: String
   timestamp: Date
   status: Status!
-
-  # endpoint: String! # TODO need updated contract
 }
 
 type Era @entity {
@@ -72,9 +70,11 @@ type Indexer @entity {
 
   lastRewardedEra: String # hex encoding
 
-  singleChallengePts: Int!
   demoProjectsIndexed: [String]! # projects indexed so far from demo project list 
+  singleChallengePts: Int!
   singleChallenges: [SingleChallengesRecord]! # Record of single challenges acheived
+
+  active: Boolean
 }
 
 type Delegator @entity {
@@ -82,6 +82,9 @@ type Delegator @entity {
 
   totalDelegations: EraValue!
   delegations: [Delegation] @derivedFrom(field: "delegator")
+  
+  singleChallengePts: Int!
+  singleChallenges: [SingleChallengesRecord]! # Record of single challenges acheived
 }
 
 type Delegation @entity {

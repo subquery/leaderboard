@@ -15,12 +15,16 @@ import FrontierEthProvider from './ethProvider';
 import {
   ERA_MANAGER_ADDRESS,
   upsertEraValue,
-  updateChallengeStatus,
+  updateIndexerChallenges,
   updateTotalDelegation,
   updateTotalStake,
+  updateDelegatorChallenges,
 } from './utils';
 import { BigNumber } from '@ethersproject/bignumber';
-import { FrontierEvmEvent } from '@subql/contract-processors/dist/frontierEvm';
+import {
+  FrontierEvmCall,
+  FrontierEvmEvent,
+} from '@subql/contract-processors/dist/frontierEvm';
 
 function getDelegationId(delegator: string, indexer: string): string {
   return `${delegator}:${indexer}`;
@@ -91,7 +95,7 @@ export async function handleAddDelegation(
   await delegation.save();
 
   if (source !== indexer) {
-    await updateChallengeStatus(indexer, 'ATTRACT_DELEGATOR');
+    await updateIndexerChallenges(indexer, 'ATTRACT_DELEGATOR');
   }
 }
 
@@ -124,7 +128,8 @@ export async function handleRemoveDelegation(
   await updateTotalStake(eraManager, indexer, amount.toBigInt(), 'sub');
 
   await delegation.save();
-  await updateChallengeStatus(delegation.indexerId, 'INDEXER_UNDELEGATED');
+  await updateIndexerChallenges(delegation.indexerId, 'INDEXER_UNDELEGATED');
+  await updateDelegatorChallenges(delegation.delegatorId, 'UNDELEGATE_INDEXER');
 }
 
 /* TODO wait for new contracts */
@@ -165,7 +170,8 @@ export async function handleWithdrawClaimed(
   withdrawl.claimed = true;
 
   await withdrawl.save();
-  await updateChallengeStatus(withdrawl.indexer, 'WITHDRAW_CLAIMED');
+  await updateIndexerChallenges(withdrawl.indexer, 'WITHDRAW_CLAIMED');
+  await updateDelegatorChallenges(withdrawl.delegator, 'WITHDRAW_CLAIMED');
 }
 
 export async function handleSetCommissionRate(
@@ -180,8 +186,31 @@ export async function handleSetCommissionRate(
     new FrontierEthProvider()
   );
 
-  const indexer = await Indexer.get(address);
-  assert(indexer, `Expected indexer (${address}) to exist`);
+  let indexer = await Indexer.get(address);
+
+  if (!indexer) {
+    indexer = Indexer.create({
+      id: address,
+      metadata: '',
+      totalStake: {
+        era: -1,
+        value: BigInt(0).toJSONType(),
+        valueAfter: BigInt(0).toJSONType(),
+      },
+      commission: {
+        era: -1,
+        value: BigInt(0).toJSONType(),
+        valueAfter: BigInt(0).toJSONType(),
+      },
+      singleChallengePts: 0,
+      singleChallenges: [],
+      demoProjectsIndexed: [],
+      active: true,
+    });
+  }
+
+  await indexer.save();
+  // assert(indexer, `Expected indexer (${address}) to exist`);
 
   const newCommission = await upsertEraValue(
     eraManager,
@@ -193,9 +222,25 @@ export async function handleSetCommissionRate(
   );
 
   if (newCommission.value !== indexer.commission.value) {
-    await updateChallengeStatus(indexer.id, 'CHANGE_COMMISSION');
+    await updateIndexerChallenges(indexer.id, 'CHANGE_COMMISSION');
   }
 
   indexer.commission = newCommission;
   await indexer.save();
+}
+//FIXME: above logic can be simplified
+
+type RedelegateArgs = [string, string, BigNumber] & {
+  _from_indexer: string;
+  to: string;
+  _value: BigNumber;
+};
+
+export async function handleRedelegation(
+  call: FrontierEvmCall<RedelegateArgs>
+): Promise<void> {
+  const info = call.from;
+  logger.info(info);
+  await updateDelegatorChallenges(call.from, 'REDELEGATE_INDEXER');
+  logger.info(JSON.stringify(call));
 }

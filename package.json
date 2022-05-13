@@ -22,11 +22,10 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@polkadot/api": "^7",
-    "@subql/cli": "^0.19.1-6",
+    "@subql/cli": "^1.0.0",
     "@subql/types": "latest",
     "@types/bs58": "^4.0.1",
     "@types/js-yaml": "^4.0.5",
-    "@types/pino": "^7.0.5",
     "@typescript-eslint/eslint-plugin": "4",
     "@typescript-eslint/parser": "4",
     "eslint": "7",
@@ -42,14 +41,14 @@
   "dependencies": {
     "@subql/contract-processors": "^0.5.3",
     "@subql/contract-sdk": "^0.5.0",
+    "@types/pino": "^7.0.5",
     "@types/validator": "^13.7.1",
     "bs58": "^4.0.1",
     "moonbeam-types-bundle": "^2.0.3",
     "pino": "^7.8.0"
   },
   "resolutions": {
-    "class-transformer": "0.4.0",
-    "ipfs-unixfs": "6.0.6"
+    "class-transformer": "0.4.0"
   },
   "lint-staged": {
     "*.ts": "eslint --cache --fix",

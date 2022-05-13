@@ -24,7 +24,7 @@ import {
   bnToDate,
   bytesToIpfsCid,
   DEMO_PROJECTS,
-  updateChallengeStatus,
+  updateIndexerChallenges,
 } from './utils';
 import { FrontierEvmEvent } from '@subql/contract-processors/dist/frontierEvm';
 
@@ -163,14 +163,14 @@ export async function handleIndexingReady(
     if (!indexer.demoProjectsIndexed.includes(deploymentId)) {
       indexer.demoProjectsIndexed.push(deploymentId);
     }
-    await updateChallengeStatus(indexer.id, 'INDEX_SINGLE');
+    await updateIndexerChallenges(indexer.id, 'INDEX_SINGLE');
   }
 
   if (
     indexer.demoProjectsIndexed.length === DEMO_PROJECTS.length &&
     indexer.demoProjectsIndexed.every((el) => DEMO_PROJECTS.includes(el))
   ) {
-    await updateChallengeStatus(indexer.id, 'INDEX_ALL');
+    await updateIndexerChallenges(indexer.id, 'INDEX_ALL');
   }
   await indexer.save();
 }
