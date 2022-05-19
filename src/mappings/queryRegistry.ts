@@ -162,6 +162,7 @@ export async function handleIndexingReady(
   if (DEMO_PROJECTS.includes(deploymentId)) {
     if (!indexer.demoProjectsIndexed.includes(deploymentId)) {
       indexer.demoProjectsIndexed.push(deploymentId);
+      await indexer.save();
     }
     await updateIndexerChallenges(indexer.id, 'INDEX_SINGLE');
   }
@@ -172,7 +173,6 @@ export async function handleIndexingReady(
   ) {
     await updateIndexerChallenges(indexer.id, 'INDEX_ALL');
   }
-  await indexer.save();
 }
 
 export async function handleStopIndexing(

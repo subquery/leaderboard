@@ -11,7 +11,6 @@ interface Challenge_Details {
   [key: string]: string;
 }
 
-// One off challenges to complete
 export const INDEXER_CHALLENGE_PTS: Challenge_Pts = {
   INDEX_SINGLE: 10,
   INDEX_ALL: 50,
@@ -20,7 +19,6 @@ export const INDEXER_CHALLENGE_PTS: Challenge_Pts = {
   DEFAULT_PLAN: 50,
   OVERRIDE_PLAN: 50,
   SERVICE_AGREEMENT: 50,
-  //new challenges
   CLAIM_REWARD: 20,
   INDEXER_UNDELEGATED: 20,
   WITHDRAW_CLAIMED: 50,
@@ -29,12 +27,11 @@ export const INDEXER_CHALLENGE_PTS: Challenge_Pts = {
 export const INDEXER_CHALLENGE_DETAILS: Challenge_Details = {
   INDEX_SINGLE: 'Fully index a project from demo projects list',
   INDEX_ALL: 'Index all projects from demo projects list',
-  ATTRACT_DELEGATOR: 'Attract your first delegator',
+  ATTRACT_DELEGATOR: 'Get your first delegator',
   CHANGE_COMMISSION: 'Either increase of decrease commission rate',
   DEFAULT_PLAN: 'Create a default plan',
   OVERRIDE_PLAN: 'Create a override plan',
   SERVICE_AGREEMENT: 'Create a service aggreement',
-  //new challenges
   CLAIM_REWARD: 'Indexer claims a reward',
   WITHDRAW_CLAIMED: 'Delegator withdraws unstaked amount from indexer',
   INDEXER_UNDELEGATED: 'Indexer gets delegation removed',
@@ -243,12 +240,6 @@ export async function updateIndexerChallenges(
 ): Promise<void> {
   const indexerRecord = await Indexer.get(indexerAddress);
 
-  logger.info(
-    `updateIndexerChallenges: ${indexerAddress}, ${challengeType}, ${
-      indexerRecord ? 'true' : 'false'
-    } `
-  );
-
   if (!indexerRecord) {
     logger.warn(
       `cannot find indexer to add challenge: ${indexerAddress}, ${challengeType}`
@@ -270,6 +261,12 @@ export async function updateIndexerChallenges(
     indexerRecord.singleChallengePts +=
       indexerRecord.singleChallenges[length - 1].points;
   }
+
+  logger.info(
+    `updateIndexerChallenges: ${indexerAddress}, ${challengeType}, ${result}, ${JSON.stringify(
+      indexerRecord.singleChallenges
+    )}`
+  );
 
   await indexerRecord.save();
 }

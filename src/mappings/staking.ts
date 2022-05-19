@@ -212,7 +212,7 @@ export async function handleSetCommissionRate(
   await indexer.save();
   // assert(indexer, `Expected indexer (${address}) to exist`);
 
-  const newCommission = await upsertEraValue(
+  indexer.commission = await upsertEraValue(
     eraManager,
     indexer.commission,
     event.args.amount.toBigInt(),
@@ -221,11 +221,10 @@ export async function handleSetCommissionRate(
     indexer.commission.era === -1
   );
 
-  if (newCommission.value !== indexer.commission.value) {
+  if (indexer.commission.value !== indexer.commission.valueAfter) {
     await updateIndexerChallenges(indexer.id, 'CHANGE_COMMISSION');
   }
 
-  indexer.commission = newCommission;
   await indexer.save();
 }
 //FIXME: above logic can be simplified
@@ -239,8 +238,5 @@ type RedelegateArgs = [string, string, BigNumber] & {
 export async function handleRedelegation(
   call: FrontierEvmCall<RedelegateArgs>
 ): Promise<void> {
-  const info = call.from;
-  logger.info(info);
   await updateDelegatorChallenges(call.from, 'REDELEGATE_INDEXER');
-  logger.info(JSON.stringify(call));
 }
