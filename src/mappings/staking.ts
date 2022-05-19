@@ -209,7 +209,6 @@ export async function handleSetCommissionRate(
     });
   }
 
-  await indexer.save();
   // assert(indexer, `Expected indexer (${address}) to exist`);
 
   indexer.commission = await upsertEraValue(
@@ -221,11 +220,11 @@ export async function handleSetCommissionRate(
     indexer.commission.era === -1
   );
 
+  await indexer.save();
+
   if (indexer.commission.value !== indexer.commission.valueAfter) {
     await updateIndexerChallenges(indexer.id, 'CHANGE_COMMISSION');
   }
-
-  await indexer.save();
 }
 //FIXME: above logic can be simplified
 
