@@ -21,10 +21,7 @@ import {
   updateDelegatorChallenges,
 } from './utils';
 import { BigNumber } from '@ethersproject/bignumber';
-import {
-  FrontierEvmCall,
-  FrontierEvmEvent,
-} from '@subql/contract-processors/dist/frontierEvm';
+import { FrontierEvmEvent } from '@subql/contract-processors/dist/frontierEvm';
 
 function getDelegationId(delegator: string, indexer: string): string {
   return `${delegator}:${indexer}`;
@@ -226,16 +223,15 @@ export async function handleSetCommissionRate(
     await updateIndexerChallenges(indexer.id, 'CHANGE_COMMISSION');
   }
 }
-//FIXME: above logic can be simplified
 
-type RedelegateArgs = [string, string, BigNumber] & {
-  _from_indexer: string;
-  to: string;
-  _value: BigNumber;
-};
+// type RedelegateArgs = [string, string, BigNumber] & {
+//   _from_indexer: string;
+//   to: string;
+//   _value: BigNumber;
+// };
 
-export async function handleRedelegation(
-  call: FrontierEvmCall<RedelegateArgs>
-): Promise<void> {
-  await updateDelegatorChallenges(call.from, 'REDELEGATE_INDEXER');
-}
+// export async function handleRedelegation(
+//   call: FrontierEvmCall<RedelegateArgs>
+// ): Promise<void> {
+//   await updateDelegatorChallenges(call.from, 'REDELEGATE_INDEXER');
+// }

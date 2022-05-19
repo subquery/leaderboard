@@ -20,8 +20,8 @@ export const INDEXER_CHALLENGE_PTS: Challenge_Pts = {
   OVERRIDE_PLAN: 50,
   SERVICE_AGREEMENT: 50,
   CLAIM_REWARD: 20,
-  INDEXER_UNDELEGATED: 20,
   WITHDRAW_CLAIMED: 50,
+  INDEXER_UNDELEGATED: 20,
 };
 
 export const INDEXER_CHALLENGE_DETAILS: Challenge_Details = {
@@ -40,15 +40,13 @@ export const INDEXER_CHALLENGE_DETAILS: Challenge_Details = {
 export const DELEGATOR_CHALLENGE_PTS: Challenge_Pts = {
   CLAIM_REWARD: 20,
   WITHDRAW_CLAIMED: 50,
-  REDELEGATE_INDEXER: 50,
   UNDELEGATE_INDEXER: 50,
 };
 
 export const DELEGATOR_CHALLENGE_DETAILS: Challenge_Details = {
   CLAIM_REWARD: 'Indexer claims a reward',
   WITHDRAW_CLAIMED: 'Delegator withdraws unstaked amount from indexer',
-  REDELEGATE_INDEXER: 'Redelegate sqt from one indexer to another',
-  UNDELEGATE_INDEXER: 'Delegator removed delagation to indexer',
+  UNDELEGATE_INDEXER: 'Delegator removed delegation to indexer',
 };
 
 export const DEMO_PROJECTS = [
