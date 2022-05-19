@@ -223,15 +223,3 @@ export async function handleSetCommissionRate(
     await updateIndexerChallenges(indexer.id, 'CHANGE_COMMISSION');
   }
 }
-
-// type RedelegateArgs = [string, string, BigNumber] & {
-//   _from_indexer: string;
-//   to: string;
-//   _value: BigNumber;
-// };
-
-// export async function handleRedelegation(
-//   call: FrontierEvmCall<RedelegateArgs>
-// ): Promise<void> {
-//   await updateDelegatorChallenges(call.from, 'REDELEGATE_INDEXER');
-// }
