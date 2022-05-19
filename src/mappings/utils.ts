@@ -2,7 +2,6 @@ import bs58 from 'bs58';
 import { BigNumber } from '@ethersproject/bignumber';
 import { EraManager } from '@subql/contract-sdk';
 import { Delegator, Indexer, EraValue, JSONBigInt } from '../types';
-
 import testnetAddresses from '@subql/contract-sdk/publish/testnet.json';
 
 interface Challenge_Pts {
@@ -12,8 +11,7 @@ interface Challenge_Details {
   [key: string]: string;
 }
 
-// One off challenges to complete
-export const CHALLENGES_PTS: Challenge_Pts = {
+export const INDEXER_CHALLENGE_PTS: Challenge_Pts = {
   INDEX_SINGLE: 10,
   INDEX_ALL: 50,
   ATTRACT_DELEGATOR: 20,
@@ -21,19 +19,38 @@ export const CHALLENGES_PTS: Challenge_Pts = {
   DEFAULT_PLAN: 50,
   OVERRIDE_PLAN: 50,
   SERVICE_AGREEMENT: 50,
+  CLAIM_REWARD: 20,
+  INDEXER_UNDELEGATED: 20,
+  WITHDRAW_CLAIMED: 50,
 };
 
-export const CHALLENGES_DETAILS: Challenge_Details = {
+export const INDEXER_CHALLENGE_DETAILS: Challenge_Details = {
   INDEX_SINGLE: 'Fully index a project from demo projects list',
   INDEX_ALL: 'Index all projects from demo projects list',
-  ATTRACT_DELEGATOR: 'Attract your first delegator',
+  ATTRACT_DELEGATOR: 'Get your first delegator',
   CHANGE_COMMISSION: 'Either increase of decrease commission rate',
   DEFAULT_PLAN: 'Create a default plan',
   OVERRIDE_PLAN: 'Create a override plan',
   SERVICE_AGREEMENT: 'Create a service aggreement',
+  CLAIM_REWARD: 'Indexer claims a reward',
+  WITHDRAW_CLAIMED: 'Delegator withdraws unstaked amount from indexer',
+  INDEXER_UNDELEGATED: 'Indexer gets delegation removed',
 };
 
-// IPFS HASH of deployments
+export const DELEGATOR_CHALLENGE_PTS: Challenge_Pts = {
+  CLAIM_REWARD: 20,
+  WITHDRAW_CLAIMED: 50,
+  REDELEGATE_INDEXER: 50,
+  UNDELEGATE_INDEXER: 50,
+};
+
+export const DELEGATOR_CHALLENGE_DETAILS: Challenge_Details = {
+  CLAIM_REWARD: 'Indexer claims a reward',
+  WITHDRAW_CLAIMED: 'Delegator withdraws unstaked amount from indexer',
+  REDELEGATE_INDEXER: 'Redelegate sqt from one indexer to another',
+  UNDELEGATE_INDEXER: 'Delegator removed delagation to indexer',
+};
+
 export const DEMO_PROJECTS = [
   'QmYR8xQgAXuCXMPGPVxxR91L4VtKZsozCM7Qsa5oAbyaQ3', //Staking Threshold - Polkadot
   'QmSzPQ9f4U1GERvN1AxJ28xq9B5s4M72CPvotmmv1N2bN7', //Staking Threshold - Kusama
@@ -201,6 +218,8 @@ export async function updateTotalDelegation(
         operation,
         applyInstantly
       ),
+      singleChallengePts: 0,
+      singleChallenges: [],
     });
   } else {
     delegator.totalDelegations = await upsertEraValue(
@@ -215,16 +234,16 @@ export async function updateTotalDelegation(
   await delegator.save();
 }
 
-export async function updateChallengeStatus(
+export async function updateIndexerChallenges(
   indexerAddress: string,
   challengeType: string
 ): Promise<void> {
   const indexerRecord = await Indexer.get(indexerAddress);
 
-  logger.info(`updateChallengeStatus: ${indexerAddress}, ${challengeType} `);
-
   if (!indexerRecord) {
-    logger.error('cannot find, no indexer to update');
+    logger.warn(
+      `cannot find indexer to add challenge: ${indexerAddress}, ${challengeType}`
+    );
     return;
   }
 
@@ -235,13 +254,57 @@ export async function updateChallengeStatus(
   if (result === -1) {
     const length = indexerRecord.singleChallenges.push({
       title: challengeType,
-      points: CHALLENGES_PTS[challengeType],
-      details: CHALLENGES_DETAILS[challengeType],
+      points: INDEXER_CHALLENGE_PTS[challengeType],
+      details: INDEXER_CHALLENGE_DETAILS[challengeType],
     });
 
     indexerRecord.singleChallengePts +=
       indexerRecord.singleChallenges[length - 1].points;
   }
 
+  logger.info(
+    `updateIndexerChallenges: ${indexerAddress}, ${challengeType}, ${result}, ${JSON.stringify(
+      indexerRecord.singleChallenges
+    )}`
+  );
+
   await indexerRecord.save();
+}
+
+//FIXME: turn these into one function
+export async function updateDelegatorChallenges(
+  delegatorAddress: string,
+  challengeType: string
+): Promise<void> {
+  const delegatorRecord = await Delegator.get(delegatorAddress);
+
+  logger.info(
+    `updateDelegatorChallenges: ${delegatorAddress}, ${challengeType}, ${
+      delegatorRecord ? 'true' : 'false'
+    } `
+  );
+
+  if (!delegatorRecord) {
+    logger.warn(
+      `cannot find delegator to add challenge: ${delegatorAddress}, ${challengeType}`
+    );
+    return;
+  }
+
+  const result = delegatorRecord.singleChallenges.findIndex(
+    ({ title }) => title === challengeType
+  );
+
+  if (result === -1) {
+    const length = delegatorRecord.singleChallenges.push({
+      title: challengeType,
+      points: DELEGATOR_CHALLENGE_PTS[challengeType],
+      details: DELEGATOR_CHALLENGE_DETAILS[challengeType],
+    });
+
+    delegatorRecord.singleChallengePts +=
+      delegatorRecord.singleChallenges[length - 1].points;
+  }
+
+  await delegatorRecord.save();
 }

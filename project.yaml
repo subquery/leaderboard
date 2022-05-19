@@ -1,33 +1,27 @@
-specVersion: 0.2.0
+specVersion: 1.0.0
 name: subquery-leaderboard 
 version: 1.0.0
+runner:
+  node:
+    name: '@subql/node'
+    version: '>=0.35.2'
+  query:
+    name: '@subql/query'
+    version: '*'
 description: ''
 repository: ''
 schema:
   file: ./schema.graphql
 network:
-  # SQN testnet
-  genesisHash: '0x6b18138563ba86208d17839ff4f48e2f1fcaddb520de82bb6a731bcb5e801e85'
-  # endpoint: 'https://node-6901336963938430976.jm.onfinality.io/rpc?apikey=65f0a4da-7861-429b-a21d-fd42209f4d2f'
-  endpoint: 'wss://sqtn.api.onfinality.io/public-ws'
+  chainId: '0x6b18138563ba86208d17839ff4f48e2f1fcaddb520de82bb6a731bcb5e801e85'
+  endpoint: wss://sqtn.api.onfinality.io/public-ws
   dictionary: https://api.subquery.network/sq/subquery/subquery-testnet-dictionary
-
-  chaintypes:
+  chainTypes:
     file: ./dist/chaintypes.js
-
-# To have all the indexers from season 1
-x-frontier-s1: &frontier-s1
-  kind: substrate/FrontierEvm
-  startBlock: 1
-  processor: &frontier-processor-s1
-    file: './dist/frontierEvm.js'
-  assets:
-   indexerRegistry:
-      file: ./node_modules/@subql/contract-sdk/artifacts/contracts/IndexerRegistry.sol/IndexerRegistry.json
 
 x-frontier: &frontier
   kind: substrate/FrontierEvm
-  startBlock: 164125 # Season 2 start block
+  startBlock: 1
   processor: &frontier-processor
     file: './dist/frontierEvm.js'
   assets:
@@ -35,6 +29,8 @@ x-frontier: &frontier
       file: ./node_modules/@subql/contract-sdk/artifacts/contracts/EraManager.sol/EraManager.json
     staking:
       file: ./node_modules/@subql/contract-sdk/artifacts/contracts/Staking.sol/Staking.json
+    indexerRegistry:
+      file: ./node_modules/@subql/contract-sdk/artifacts/contracts/IndexerRegistry.sol/IndexerRegistry.json
     queryRegistry:
       file: ./node_modules/@subql/contract-sdk/artifacts/contracts/QueryRegistry.sol/QueryRegistry.json
     planManager:
@@ -45,9 +41,23 @@ x-frontier: &frontier
       file: ./node_modules/@subql/contract-sdk/artifacts/contracts/RewardsDistributer.sol/RewardsDistributer.json
 
 dataSources:
-  - <<: *frontier-s1
+  - <<: *frontier
     processor:
-      <<: *frontier-processor-s1
+      <<: *frontier-processor
+      options:
+        abi: eraManager
+        address: '0x09eda5f3D448A02bF21B51223bB3aD5c5c8DA151'
+    mapping:
+      file: ./dist/index.js
+      handlers:
+        - handler: handleNewEra
+          kind: substrate/FrontierEvmEvent
+          filter:
+            topics:
+              - NewEraStart(uint256 indexed era, address caller)
+  - <<: *frontier
+    processor:
+      <<: *frontier-processor
       options:
         abi: indexerRegistry
         address: '0xe5B4EA276e1030F55790bB8695bC1f8362241bb9'
@@ -83,20 +93,6 @@ dataSources:
     processor:
       <<: *frontier-processor
       options:
-        abi: eraManager
-        address: '0x09eda5f3D448A02bF21B51223bB3aD5c5c8DA151'
-    mapping:
-      file: ./dist/index.js
-      handlers:
-        - handler: handleNewEra
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - NewEraStart(uint256 indexed era, address caller)
-  - <<: *frontier
-    processor:
-      <<: *frontier-processor
-      options:
         abi: staking
         address: '0x2F50025987C58549018841e007c61759d8Fb9BeD'
     mapping:
@@ -127,6 +123,10 @@ dataSources:
           filter:
             topics:
               - SetCommissionRate(address indexed indexer, uint256 amount)
+        - handler: handleRedelegation
+          kind: substrate/FrontierEvmCall
+          filter:
+            function: redelegate(address from_indexer, address to,uint256 value)
   - <<: *frontier
     processor:
       <<: *frontier-processor
@@ -219,27 +219,27 @@ dataSources:
           filter:
             topics:
               - ServiceAgreementCreated(address indexed consumer, address indexed indexer, bytes32 indexed deploymentId, address serviceAgreement)
-  # - <<: *frontier
-  #   processor:
-  #     <<: *frontier-processor
-  #     options:
-  #       abi: rewardsDistributor
-  #       address: '0xA500a3ad54223B7E18D7d73da34f2EF06aCa77eC'
-  #   mapping:
-  #     file: ./dist/index.js
-  #     handlers:
-  #       - handler: handleRewardsDistributed
-  #         kind: substrate/FrontierEvmEvent
-  #         filter:
-  #           topics:
-  #             - DistributeRewards(address indexed indexer, uint256 indexed eraIdx)
-  #       - handler: handleRewardsClaimed
-  #         kind: substrate/FrontierEvmEvent
-  #         filter:
-  #           topics:
-  #             - ClaimRewards(address indexed indexer, address indexed delegator, uint256 rewards)
-  #       - handler: handleRewardsUpdated
-  #         kind: substrate/FrontierEvmEvent
-  #         filter:
-  #           topics:
-  #             - RewardsChanged(address indexed indexer, uint256 indexed eraIdx, uint256 additions, uint256 removals)
+  - <<: *frontier
+    processor:
+      <<: *frontier-processor
+      options:
+        abi: rewardsDistributor
+        address: '0xA500a3ad54223B7E18D7d73da34f2EF06aCa77eC'
+    mapping:
+      file: ./dist/index.js
+      handlers:
+        - handler: handleRewardsDistributed
+          kind: substrate/FrontierEvmEvent
+          filter:
+            topics:
+              - DistributeRewards(address indexed indexer, uint256 indexed eraIdx)
+        - handler: handleRewardsClaimed
+          kind: substrate/FrontierEvmEvent
+          filter:
+            topics:
+              - ClaimRewards(address indexed indexer, address indexed delegator, uint256 rewards)
+        - handler: handleRewardsUpdated
+          kind: substrate/FrontierEvmEvent
+          filter:
+            topics:
+              - RewardsChanged(address indexed indexer, uint256 indexed eraIdx, uint256 additions, uint256 removals)

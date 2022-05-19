@@ -9,12 +9,12 @@ import {
 import {
   bytesToIpfsCid,
   PLAN_MANAGER_ADDRESS,
-  updateChallengeStatus,
+  updateIndexerChallenges,
 } from './utils';
 import { constants } from 'ethers';
 
 import assert from 'assert';
-import { Deployment, Plan, PlanTemplate } from '../types';
+import { Plan, PlanTemplate } from '../types';
 import { PlanManager__factory } from '@subql/contract-sdk';
 import FrontierEthProvider from './ethProvider';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -62,11 +62,10 @@ export async function handlePlanTemplateMetadataUpdated(
   const id = event.args.planTemplateId.toHexString();
 
   const planTemplate = await PlanTemplate.get(id);
+  assert(planTemplate, `Plan template not found. templateId="${id}"`);
+  planTemplate.metadata = bytesToIpfsCid(event.args.metadata);
 
-  if(planTemplate){
-    planTemplate.metadata = bytesToIpfsCid(event.args.metadata);
-    await planTemplate.save();
-  }
+  await planTemplate.save();
 }
 
 export async function handlePlanTemplateStatusUpdated(
@@ -77,12 +76,11 @@ export async function handlePlanTemplateStatusUpdated(
 
   const id = event.args.planTemplateId.toHexString();
   const planTemplate = await PlanTemplate.get(id);
+  assert(planTemplate, `Plan template not found. templateId="${id}"`);
 
-  if(planTemplate){
-    planTemplate.active = event.args.active;
-    await planTemplate.save();
-  }
+  planTemplate.active = event.args.active;
 
+  await planTemplate.save();
 }
 
 export async function handlePlanCreated(
@@ -90,17 +88,6 @@ export async function handlePlanCreated(
 ): Promise<void> {
   logger.info('handlePlanCreated');
   assert(event.args, 'No event args');
-
-  const deployment = await Deployment.get(
-    bytesToIpfsCid(event.args.deploymentId)
-  );
-
-  if (!deployment) {
-    logger.warn(
-      `Cannot find deployment with ${bytesToIpfsCid(event.args.deploymentId)}`
-    );
-    return;
-  }
 
   const plan = Plan.create({
     id: getPlanId(event.args.creator, event.args.planId),
@@ -115,9 +102,9 @@ export async function handlePlanCreated(
   });
 
   if (plan.deploymentId) {
-    await updateChallengeStatus(event.args.creator, 'OVERRIDE_PLAN');
+    await updateIndexerChallenges(event.args.creator, 'OVERRIDE_PLAN');
   } else {
-    await updateChallengeStatus(event.args.creator, 'DEFAULT_PLAN');
+    await updateIndexerChallenges(event.args.creator, 'DEFAULT_PLAN');
   }
 
   await plan.save();
@@ -130,12 +117,9 @@ export async function handlePlanRemoved(
   assert(event.args, 'No event args');
 
   const planId = getPlanId(event.args.source, event.args.id);
-  const plan = await Plan.get(planId);
 
-  if (!plan) {
-    logger.warn(`no plan to remove (${event.args.id.toHexString()})`);
-    return;
-  }
+  const plan = await Plan.get(planId);
+  assert(plan, `Plan not found. planId="${planId}"`);
 
   plan.active = false;
 

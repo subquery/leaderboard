@@ -16,7 +16,11 @@ import {
   DistributeRewardsEvent,
   RewardsChangedEvent,
 } from '@subql/contract-sdk/typechain/RewardsDistributer';
-import { REWARD_DIST_ADDRESS } from './utils';
+import {
+  REWARD_DIST_ADDRESS,
+  updateDelegatorChallenges,
+  updateIndexerChallenges,
+} from './utils';
 import { FrontierEvmEvent } from '@subql/contract-processors/dist/frontierEvm';
 import { BigNumber } from '@ethersproject/bignumber';
 
@@ -86,7 +90,9 @@ export async function handleRewardsClaimed(
   assert(
     event.args.rewards.isZero() ||
       unclaimed?.amount === event.args.rewards.toBigInt(),
-    `unclaimed reward doesn't match claimed reward`
+    `unclaimed reward doesn't match claimed reward ${
+      unclaimed?.amount
+    } ${event.args.rewards.toBigInt()}`
   );
 
   await UnclaimedReward.remove(id);
@@ -100,8 +106,8 @@ export async function handleRewardsClaimed(
   });
 
   await reward.save();
-
-  // throw new Error('DONE')
+  await updateIndexerChallenges(event.args.indexer, 'CLAIM_REWARD');
+  await updateDelegatorChallenges(event.args.delegator, 'CLAIM_REWARD');
 }
 
 export async function handleRewardsUpdated(
