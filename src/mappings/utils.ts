@@ -22,6 +22,7 @@ export const INDEXER_CHALLENGE_PTS: Challenge_Pts = {
   CLAIM_REWARD: 20,
   WITHDRAW_CLAIMED: 50,
   INDEXER_UNDELEGATED: 20,
+  UNREGISTER_INDEXER: 30,
 };
 
 export const INDEXER_CHALLENGE_DETAILS: Challenge_Details = {
@@ -31,10 +32,11 @@ export const INDEXER_CHALLENGE_DETAILS: Challenge_Details = {
   CHANGE_COMMISSION: 'Either increase of decrease commission rate',
   DEFAULT_PLAN: 'Create a default plan',
   OVERRIDE_PLAN: 'Create a override plan',
-  SERVICE_AGREEMENT: 'Create a service aggreement',
+  SERVICE_AGREEMENT: 'Get a service agreement from consumer',
   CLAIM_REWARD: 'Indexer claims a reward',
   WITHDRAW_CLAIMED: 'Delegator withdraws unstaked amount from indexer',
   INDEXER_UNDELEGATED: 'Indexer gets delegation removed',
+  UNREGISTER_INDEXER: 'Unregister your indexer',
 };
 
 export const DELEGATOR_CHALLENGE_PTS: Challenge_Pts = {

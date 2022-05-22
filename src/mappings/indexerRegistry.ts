@@ -13,7 +13,12 @@ import {
 import assert from 'assert';
 import { Indexer } from '../types';
 import FrontierEthProvider from './ethProvider';
-import { bytesToIpfsCid, upsertEraValue, ERA_MANAGER_ADDRESS } from './utils';
+import {
+  bytesToIpfsCid,
+  upsertEraValue,
+  ERA_MANAGER_ADDRESS,
+  updateIndexerChallenges,
+} from './utils';
 
 /* Indexer Registry Handlers */
 export async function handleRegisterIndexer(
@@ -71,6 +76,8 @@ export async function handleUnregisterIndexer(
 
   indexer.active = false;
   await indexer.save();
+
+  await updateIndexerChallenges(indexer.id, 'UNREGISTER_INDEXER');
 }
 
 export async function handleUpdateIndexerMetadata(
