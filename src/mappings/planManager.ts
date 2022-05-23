@@ -102,9 +102,17 @@ export async function handlePlanCreated(
   });
 
   if (plan.deploymentId) {
-    await updateIndexerChallenges(event.args.creator, 'OVERRIDE_PLAN');
+    await updateIndexerChallenges(
+      event.args.creator,
+      'OVERRIDE_PLAN',
+      event.blockNumber
+    );
   } else {
-    await updateIndexerChallenges(event.args.creator, 'DEFAULT_PLAN');
+    await updateIndexerChallenges(
+      event.args.creator,
+      'DEFAULT_PLAN',
+      event.blockNumber
+    );
   }
 
   await plan.save();

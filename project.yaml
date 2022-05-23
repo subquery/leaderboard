@@ -123,10 +123,6 @@ dataSources:
           filter:
             topics:
               - SetCommissionRate(address indexed indexer, uint256 amount)
-        - handler: handleRedelegation
-          kind: substrate/FrontierEvmCall
-          filter:
-            function: redelegate(address from_indexer, address to,uint256 value)
   - <<: *frontier
     processor:
       <<: *frontier-processor

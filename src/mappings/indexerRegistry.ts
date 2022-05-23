@@ -77,7 +77,11 @@ export async function handleUnregisterIndexer(
   indexer.active = false;
   await indexer.save();
 
-  await updateIndexerChallenges(indexer.id, 'UNREGISTER_INDEXER');
+  await updateIndexerChallenges(
+    indexer.id,
+    'UNREGISTER_INDEXER',
+    event.blockNumber
+  );
 }
 
 export async function handleUpdateIndexerMetadata(

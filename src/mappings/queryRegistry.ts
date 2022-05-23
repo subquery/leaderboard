@@ -164,14 +164,18 @@ export async function handleIndexingReady(
       indexer.demoProjectsIndexed.push(deploymentId);
       await indexer.save();
     }
-    await updateIndexerChallenges(indexer.id, 'INDEX_SINGLE');
+    await updateIndexerChallenges(
+      indexer.id,
+      'INDEX_SINGLE',
+      event.blockNumber
+    );
   }
 
   if (
     indexer.demoProjectsIndexed.length === DEMO_PROJECTS.length &&
     indexer.demoProjectsIndexed.every((el) => DEMO_PROJECTS.includes(el))
   ) {
-    await updateIndexerChallenges(indexer.id, 'INDEX_ALL');
+    await updateIndexerChallenges(indexer.id, 'INDEX_ALL', event.blockNumber);
   }
 }
 

@@ -11,6 +11,8 @@ interface Challenge_Details {
   [key: string]: string;
 }
 
+export const SEASON_2_END = 340176;
+
 export const INDEXER_CHALLENGE_PTS: Challenge_Pts = {
   INDEX_SINGLE: 10,
   INDEX_ALL: 50,
@@ -236,8 +238,14 @@ export async function updateTotalDelegation(
 
 export async function updateIndexerChallenges(
   indexerAddress: string,
-  challengeType: string
+  challengeType: string,
+  blockHeight: number
 ): Promise<void> {
+  if (blockHeight >= SEASON_2_END) {
+    logger.info('season 2 has ended');
+    return;
+  }
+
   const indexerRecord = await Indexer.get(indexerAddress);
 
   if (!indexerRecord) {
@@ -274,8 +282,14 @@ export async function updateIndexerChallenges(
 //FIXME: turn these into one function
 export async function updateDelegatorChallenges(
   delegatorAddress: string,
-  challengeType: string
+  challengeType: string,
+  blockHeight: number
 ): Promise<void> {
+  if (blockHeight >= SEASON_2_END) {
+    logger.info('season 2 has ended');
+    return;
+  }
+
   const delegatorRecord = await Delegator.get(delegatorAddress);
 
   logger.info(

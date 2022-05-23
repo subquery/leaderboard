@@ -41,5 +41,9 @@ export async function handleServiceAgreementCreated(
   });
 
   await sa.save();
-  await updateIndexerChallenges(event.args.indexer, 'SERVICE_AGREEMENT');
+  await updateIndexerChallenges(
+    event.args.indexer,
+    'SERVICE_AGREEMENT',
+    event.blockNumber
+  );
 }

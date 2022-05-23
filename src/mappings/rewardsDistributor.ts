@@ -106,8 +106,16 @@ export async function handleRewardsClaimed(
   });
 
   await reward.save();
-  await updateIndexerChallenges(event.args.indexer, 'CLAIM_REWARD');
-  await updateDelegatorChallenges(event.args.delegator, 'CLAIM_REWARD');
+  await updateIndexerChallenges(
+    event.args.indexer,
+    'CLAIM_REWARD',
+    event.blockNumber
+  );
+  await updateDelegatorChallenges(
+    event.args.delegator,
+    'CLAIM_REWARD',
+    event.blockNumber
+  );
 }
 
 export async function handleRewardsUpdated(

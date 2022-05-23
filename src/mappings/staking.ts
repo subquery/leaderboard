@@ -92,7 +92,11 @@ export async function handleAddDelegation(
   await delegation.save();
 
   if (source !== indexer) {
-    await updateIndexerChallenges(indexer, 'ATTRACT_DELEGATOR');
+    await updateIndexerChallenges(
+      indexer,
+      'ATTRACT_DELEGATOR',
+      event.blockNumber
+    );
   }
 }
 
@@ -125,8 +129,16 @@ export async function handleRemoveDelegation(
   await updateTotalStake(eraManager, indexer, amount.toBigInt(), 'sub');
 
   await delegation.save();
-  await updateIndexerChallenges(delegation.indexerId, 'INDEXER_UNDELEGATED');
-  await updateDelegatorChallenges(delegation.delegatorId, 'UNDELEGATE_INDEXER');
+  await updateIndexerChallenges(
+    delegation.indexerId,
+    'INDEXER_UNDELEGATED',
+    event.blockNumber
+  );
+  await updateDelegatorChallenges(
+    delegation.delegatorId,
+    'UNDELEGATE_INDEXER',
+    event.blockNumber
+  );
 }
 
 /* TODO wait for new contracts */
@@ -167,8 +179,16 @@ export async function handleWithdrawClaimed(
   withdrawl.claimed = true;
 
   await withdrawl.save();
-  await updateIndexerChallenges(withdrawl.indexer, 'WITHDRAW_CLAIMED');
-  await updateDelegatorChallenges(withdrawl.delegator, 'WITHDRAW_CLAIMED');
+  await updateIndexerChallenges(
+    withdrawl.indexer,
+    'WITHDRAW_CLAIMED',
+    event.blockNumber
+  );
+  await updateDelegatorChallenges(
+    withdrawl.delegator,
+    'WITHDRAW_CLAIMED',
+    event.blockNumber
+  );
 }
 
 export async function handleSetCommissionRate(
@@ -220,6 +240,10 @@ export async function handleSetCommissionRate(
   await indexer.save();
 
   if (indexer.commission.value !== indexer.commission.valueAfter) {
-    await updateIndexerChallenges(indexer.id, 'CHANGE_COMMISSION');
+    await updateIndexerChallenges(
+      indexer.id,
+      'CHANGE_COMMISSION',
+      event.blockNumber
+    );
   }
 }
