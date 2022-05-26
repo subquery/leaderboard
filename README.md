@@ -1,6 +1,6 @@
 # SubQuery Testnet Leaderboard
 
-SubQuery project captured challenges completey on the network
+SubQuery project to captured challenges completed on the network
 
 ## Building
 
