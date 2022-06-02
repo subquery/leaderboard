@@ -175,4 +175,5 @@ type SingleChallengesRecord @jsonField {
   title: String!
   points: Int!
   details: String!
+  timestamp: Date!
 }

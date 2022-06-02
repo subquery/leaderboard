@@ -105,13 +105,15 @@ export async function handlePlanCreated(
     await updateIndexerChallenges(
       event.args.creator,
       'OVERRIDE_PLAN',
-      event.blockNumber
+      event.blockNumber,
+      event.blockTimestamp
     );
   } else {
     await updateIndexerChallenges(
       event.args.creator,
       'DEFAULT_PLAN',
-      event.blockNumber
+      event.blockNumber,
+      event.blockTimestamp
     );
   }
 

@@ -167,7 +167,8 @@ export async function handleIndexingReady(
     await updateIndexerChallenges(
       indexer.id,
       'INDEX_SINGLE',
-      event.blockNumber
+      event.blockNumber,
+      event.blockTimestamp
     );
   }
 
@@ -175,7 +176,12 @@ export async function handleIndexingReady(
     indexer.demoProjectsIndexed.length === DEMO_PROJECTS.length &&
     indexer.demoProjectsIndexed.every((el) => DEMO_PROJECTS.includes(el))
   ) {
-    await updateIndexerChallenges(indexer.id, 'INDEX_ALL', event.blockNumber);
+    await updateIndexerChallenges(
+      indexer.id,
+      'INDEX_ALL',
+      event.blockNumber,
+      event.blockTimestamp
+    );
   }
 }
 

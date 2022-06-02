@@ -95,7 +95,8 @@ export async function handleAddDelegation(
     await updateIndexerChallenges(
       indexer,
       'ATTRACT_DELEGATOR',
-      event.blockNumber
+      event.blockNumber,
+      event.blockTimestamp
     );
   }
 }
@@ -132,12 +133,14 @@ export async function handleRemoveDelegation(
   await updateIndexerChallenges(
     delegation.indexerId,
     'INDEXER_UNDELEGATED',
-    event.blockNumber
+    event.blockNumber,
+    event.blockTimestamp
   );
   await updateDelegatorChallenges(
     delegation.delegatorId,
     'UNDELEGATE_INDEXER',
-    event.blockNumber
+    event.blockNumber,
+    event.blockTimestamp
   );
 }
 
@@ -182,12 +185,14 @@ export async function handleWithdrawClaimed(
   await updateIndexerChallenges(
     withdrawl.indexer,
     'WITHDRAW_CLAIMED',
-    event.blockNumber
+    event.blockNumber,
+    event.blockTimestamp
   );
   await updateDelegatorChallenges(
     withdrawl.delegator,
     'WITHDRAW_CLAIMED',
-    event.blockNumber
+    event.blockNumber,
+    event.blockTimestamp
   );
 }
 
@@ -243,7 +248,8 @@ export async function handleSetCommissionRate(
     await updateIndexerChallenges(
       indexer.id,
       'CHANGE_COMMISSION',
-      event.blockNumber
+      event.blockNumber,
+      event.blockTimestamp
     );
   }
 }

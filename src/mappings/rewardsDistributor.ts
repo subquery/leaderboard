@@ -109,12 +109,14 @@ export async function handleRewardsClaimed(
   await updateIndexerChallenges(
     event.args.indexer,
     'CLAIM_REWARD',
-    event.blockNumber
+    event.blockNumber,
+    event.blockTimestamp
   );
   await updateDelegatorChallenges(
     event.args.delegator,
     'CLAIM_REWARD',
-    event.blockNumber
+    event.blockNumber,
+    event.blockTimestamp
   );
 }
 

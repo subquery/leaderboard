@@ -80,7 +80,8 @@ export async function handleUnregisterIndexer(
   await updateIndexerChallenges(
     indexer.id,
     'UNREGISTER_INDEXER',
-    event.blockNumber
+    event.blockNumber,
+    event.blockTimestamp
   );
 }
 

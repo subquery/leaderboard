@@ -44,6 +44,7 @@ export async function handleServiceAgreementCreated(
   await updateIndexerChallenges(
     event.args.indexer,
     'SERVICE_AGREEMENT',
-    event.blockNumber
+    event.blockNumber,
+    event.blockTimestamp
   );
 }
