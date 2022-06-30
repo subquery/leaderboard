@@ -1,6 +1,7 @@
 // Copyright 2020-2022 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import testnetAddresses from '@subql/contract-sdk/publish/testnet.json';
 import { Delegator, Indexer } from '../types';
 
 interface Challenge_Pts {
@@ -56,10 +57,20 @@ export const DELEGATOR_CHALLENGE_DETAILS: Challenge_Details = {
   UNDELEGATE_FROM_INDEXER: 'Delegator undelegate from an indexer',
 };
 
-export const DEMO_PROJECTS = [
+export const TESTNET_PROJECTS = [
   'QmYR8xQgAXuCXMPGPVxxR91L4VtKZsozCM7Qsa5oAbyaQ3', //Staking Threshold - Polkadot
   'QmSzPQ9f4U1GERvN1AxJ28xq9B5s4M72CPvotmmv1N2bN7', //Staking Threshold - Kusama
 ];
+
+export const QUERY_REGISTRY_ADDRESS = testnetAddresses.QueryRegistry.address;
+export const ERA_MANAGER_ADDRESS = testnetAddresses.EraManager.address;
+export const PLAN_MANAGER_ADDRESS = testnetAddresses.PlanManager.address;
+export const REWARD_DIST_ADDRESS = testnetAddresses.RewardsDistributer.address;
+export const STAKING_ADDRESS = testnetAddresses.Staking.address;
+export const SA_REGISTRY_ADDRESS =
+  testnetAddresses.ServiceAgreementRegistry.address;
+export const PURCHASE_OFFER_ADDRESS =
+  testnetAddresses.PurchaseOfferMarket.address;
 
 export type Role = Indexer | Delegator;
 
