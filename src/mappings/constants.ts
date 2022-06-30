@@ -36,8 +36,7 @@ export const INDEXER_CHALLENGE_DETAILS: Challenge_Details = {
   CREATE_DEFAULT_PLAN: 'Create a default plan',
   CREATE_SPECIFIC_PLAN: 'Create a deployment-specific plan',
   SERVICE_AGREEMENT_CREATED: 'Get a service agreement from consumer',
-  CLAIM_REWARD:
-    "Indexer claims a reward from reward distributor to an indexer's wallet",
+  CLAIM_REWARD: "Indexer claims a reward from reward distributor to an indexer's wallet",
   WITHDRAW_UNSTAKED:
     "Indexer withdraws unstaked amount from staking contract to an indexer's wallet",
   INDEXER_UNDELEGATED: 'Indexer gets undelegated from delegator',
@@ -51,8 +50,7 @@ export const DELEGATOR_CHALLENGE_PTS: Challenge_Pts = {
 };
 
 export const DELEGATOR_CHALLENGE_DETAILS: Challenge_Details = {
-  CLAIM_REWARD:
-    "Delegator claims a reward from reward distributor to delegator's wallet",
+  CLAIM_REWARD: "Delegator claims a reward from reward distributor to delegator's wallet",
   WITHDRAW_DELEGATION: 'Delegator withdraws undelegated amount from an indexer',
   UNDELEGATE_FROM_INDEXER: 'Delegator undelegate from an indexer',
 };
@@ -67,10 +65,8 @@ export const ERA_MANAGER_ADDRESS = testnetAddresses.EraManager.address;
 export const PLAN_MANAGER_ADDRESS = testnetAddresses.PlanManager.address;
 export const REWARD_DIST_ADDRESS = testnetAddresses.RewardsDistributer.address;
 export const STAKING_ADDRESS = testnetAddresses.Staking.address;
-export const SA_REGISTRY_ADDRESS =
-  testnetAddresses.ServiceAgreementRegistry.address;
-export const PURCHASE_OFFER_ADDRESS =
-  testnetAddresses.PurchaseOfferMarket.address;
+export const SA_REGISTRY_ADDRESS = testnetAddresses.ServiceAgreementRegistry.address;
+export const PURCHASE_OFFER_ADDRESS = testnetAddresses.PurchaseOfferMarket.address;
 
 export type Role = Indexer | Delegator;
 

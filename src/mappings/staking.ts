@@ -1,5 +1,6 @@
-// Copyright 2020-2022 OnFinality Limited authors & contributors
+// Copyright 2020-2022 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
 
 import { Staking__factory } from '@subql/contract-sdk';
 import {
@@ -71,7 +72,7 @@ export async function handleWithdrawClaimed(
 
   await updateDelegatorChallenges(
     delegator,
-    'WITHDRAW_CLAIMED',
+    'WITHDRAW_DELEGATION',
     event.blockNumber,
     event.blockTimestamp
   );
@@ -84,10 +85,7 @@ export async function handleSetCommissionRate(
   assert(event.args, 'No event args');
 
   const { indexer } = event.args;
-  const staking = Staking__factory.connect(
-    STAKING_ADDRESS,
-    new FrontierEthProvider()
-  );
+  const staking = Staking__factory.connect(STAKING_ADDRESS, new FrontierEthProvider());
   const commissionRates = await staking.commissionRates(indexer);
   const { valueAt, valueAfter } = commissionRates;
 

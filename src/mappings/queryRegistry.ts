@@ -1,5 +1,6 @@
-// Copyright 2020-2022 OnFinality Limited authors & contributors
+// Copyright 2020-2022 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
 
 import assert from 'assert';
 
@@ -23,7 +24,7 @@ export async function handleIndexingReady(
   if (TESTNET_PROJECTS.includes(cid)) {
     await updateIndexerChallenges(
       indexer,
-      'INDEX_SINGLE',
+      'INDEX_SINGLE_PROJECT',
       event.blockNumber,
       event.blockTimestamp
     );
@@ -34,9 +35,7 @@ export async function handleIndexingReady(
     new FrontierEthProvider()
   );
 
-  const numOfIndexing = await queryRegistry.numberOfIndexingDeployments(
-    indexer
-  );
+  const numOfIndexing = await queryRegistry.numberOfIndexingDeployments(indexer);
   if (numOfIndexing.eq(TESTNET_PROJECTS.length)) {
     await updateIndexerChallenges(
       indexer,

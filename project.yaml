@@ -1,5 +1,5 @@
 specVersion: 1.0.0
-name: subquery-leaderboard 
+name: subquery-leaderboard
 version: 1.0.0
 runner:
   node:
@@ -8,7 +8,7 @@ runner:
   query:
     name: '@subql/query'
     version: '*'
-description: ''
+description: 'Season 2 Leaderboard project for Subquery Testnet'
 repository: ''
 schema:
   file: ./schema.graphql
@@ -25,8 +25,6 @@ x-frontier: &frontier
   processor: &frontier-processor
     file: './dist/frontierEvm.js'
   assets:
-    eraManager:
-      file: ./node_modules/@subql/contract-sdk/artifacts/contracts/EraManager.sol/EraManager.json
     staking:
       file: ./node_modules/@subql/contract-sdk/artifacts/contracts/Staking.sol/Staking.json
     indexerRegistry:
@@ -45,45 +43,11 @@ dataSources:
     processor:
       <<: *frontier-processor
       options:
-        abi: eraManager
-        address: '0x09eda5f3D448A02bF21B51223bB3aD5c5c8DA151'
-    mapping:
-      file: ./dist/index.js
-      handlers:
-        - handler: handleNewEra
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - NewEraStart(uint256 indexed era, address caller)
-  - <<: *frontier
-    processor:
-      <<: *frontier-processor
-      options:
         abi: indexerRegistry
         address: '0xe5B4EA276e1030F55790bB8695bC1f8362241bb9'
     mapping:
       file: ./dist/index.js
       handlers:
-        - handler: handleRegisterIndexer
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - RegisterIndexer(address indexed indexer, uint256 amount, bytes32 metadata)
-        - handler: handleUpdateIndexerMetadata
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - UpdateMetadata(address indexed indexer, bytes32 metadata)
-        - handler: handleSetControllerAccount
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - SetControllerAccount(address indexed indexer, address indexed controller)
-        - handler: handleRemoveControllerAccount
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - RemoveControllerAccount(address indexed indexer, address indexed controller)
         - handler: handleUnregisterIndexer
           kind: substrate/FrontierEvmEvent
           filter:
@@ -108,11 +72,6 @@ dataSources:
           filter:
             topics:
               - DelegationRemoved(address indexed source, address indexed indexer, uint256 amount)
-        - handler: handleWithdrawRequested
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - UnbondRequested(address indexed source, address indexed indexer, uint256 amount, uint256 index)
         - handler: handleWithdrawClaimed
           kind: substrate/FrontierEvmEvent
           filter:
@@ -132,41 +91,11 @@ dataSources:
     mapping:
       file: ./dist/index.js
       handlers:
-        - handler: handleNewQuery
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - CreateQuery(uint256 queryId, address creator, bytes32 metadata, bytes32 deploymentId, bytes32 version)
-        - handler: handleUpdateQueryMetadata
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - UpdateQueryMetadata(address owner, uint256 queryId, bytes32 metadata)
-        - handler: handleUpdateQueryDeployment
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - UpdateQueryDeployment(address owner, uint256 queryId, bytes32 deploymentId, bytes32 version)
-        - handler: handleStartIndexing
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - StartIndexing(address indexer, bytes32 deploymentId)
-        - handler: handleIndexingUpdate
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - UpdateDeploymentStatus(address indexer, bytes32 deploymentId, uint256 blockheight, bytes32 mmrRoot, uint256 timestamp)
         - handler: handleIndexingReady
           kind: substrate/FrontierEvmEvent
           filter:
             topics:
               - UpdateIndexingStatusToReady(address indexer, bytes32 deploymentId)
-        - handler: handleStopIndexing
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - StopIndexing(address indexer, bytes32 deploymentId)
   - <<: *frontier
     processor:
       <<: *frontier-processor
@@ -176,31 +105,11 @@ dataSources:
     mapping:
       file: ./dist/index.js
       handlers:
-        - handler: handlePlanTemplateCreated
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - PlanTemplateCreated(uint256 indexed planTemplateId)
-        - handler: handlePlanTemplateMetadataUpdated
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - PlanTemplateMetadataChanged(uint256 indexed planTemplateId, bytes32 metadata)
-        - handler: handlePlanTemplateStatusUpdated
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - PlanTemplateStatusChanged(uint256 indexed planTemplateId, bool active)
         - handler: handlePlanCreated
           kind: substrate/FrontierEvmEvent
           filter:
             topics:
               - PlanCreated(address indexed creator, bytes32 indexed deploymentId, uint256 planTemplateId, uint256 planId, uint256 price)
-        - handler: handlePlanRemoved
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - PlanRemoved(address indexed source, uint256 id, bytes32 deploymentId)
   - <<: *frontier
     processor:
       <<: *frontier-processor
@@ -224,18 +133,8 @@ dataSources:
     mapping:
       file: ./dist/index.js
       handlers:
-        - handler: handleRewardsDistributed
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - DistributeRewards(address indexed indexer, uint256 indexed eraIdx)
         - handler: handleRewardsClaimed
           kind: substrate/FrontierEvmEvent
           filter:
             topics:
               - ClaimRewards(address indexed indexer, address indexed delegator, uint256 rewards)
-        - handler: handleRewardsUpdated
-          kind: substrate/FrontierEvmEvent
-          filter:
-            topics:
-              - RewardsChanged(address indexed indexer, uint256 indexed eraIdx, uint256 additions, uint256 removals)
