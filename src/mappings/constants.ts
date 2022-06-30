@@ -77,7 +77,6 @@ export type Role = Indexer | Delegator;
 export enum RoleType {
   Indexer,
   Delegator,
-  Consumer,
 }
 
 export const rolesConfig = {

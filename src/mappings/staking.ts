@@ -1,13 +1,12 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { EraManager__factory, Staking__factory } from '@subql/contract-sdk';
+import { Staking__factory } from '@subql/contract-sdk';
 import {
   DelegationAddedEvent,
   DelegationRemovedEvent,
   UnbondWithdrawnEvent,
   SetCommissionRateEvent,
-  UnbondRequestedEvent,
 } from '@subql/contract-sdk/typechain/Staking';
 import assert from 'assert';
 import FrontierEthProvider from './ethProvider';
