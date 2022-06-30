@@ -3,10 +3,7 @@
 
 import assert from 'assert';
 import { ServiceAgreementCreatedEvent } from '@subql/contract-sdk/typechain/ServiceAgreementRegistry';
-import { ServiceAgreement } from '../types';
-import { bytesToIpfsCid, updateIndexerChallenges } from './utils';
-import { IServiceAgreement__factory } from '@subql/contract-sdk';
-import FrontierEthProvider from './ethProvider';
+import { updateIndexerChallenges } from './utils';
 import { FrontierEvmEvent } from '@subql/contract-processors/dist/frontierEvm';
 
 export async function handleServiceAgreementCreated(
@@ -15,35 +12,9 @@ export async function handleServiceAgreementCreated(
   logger.info('handleServiceAgreementCreated');
   assert(event.args, 'No event args');
 
-  const saContract = IServiceAgreement__factory.connect(
-    event.args.serviceAgreement,
-    new FrontierEthProvider()
-  );
-
-  const [period, value] = await Promise.all([
-    saContract.period(),
-    saContract.value(),
-  ]);
-
-  const endTime = new Date(event.blockTimestamp);
-
-  endTime.setSeconds(endTime.getSeconds() + period.toNumber());
-
-  const sa = ServiceAgreement.create({
-    id: event.args.serviceAgreement,
-    indexerAddress: event.args.indexer,
-    consumerAddress: event.args.consumer,
-    deploymentId: bytesToIpfsCid(event.args.deploymentId),
-    period: period.toBigInt(),
-    value: value.toBigInt(),
-    startTime: event.blockTimestamp,
-    endTime,
-  });
-
-  await sa.save();
   await updateIndexerChallenges(
     event.args.indexer,
-    'SERVICE_AGREEMENT',
+    'SERVICE_AGREEMENT_CREATED',
     event.blockNumber,
     event.blockTimestamp
   );
