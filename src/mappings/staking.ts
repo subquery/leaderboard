@@ -1,35 +1,19 @@
-// Copyright 2020-2022 OnFinality Limited authors & contributors
+// Copyright 2020-2022 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { EraManager__factory } from '@subql/contract-sdk';
+
+import { Staking__factory } from '@subql/contract-sdk';
 import {
   DelegationAddedEvent,
   DelegationRemovedEvent,
-  UnbondRequestedEvent,
   UnbondWithdrawnEvent,
   SetCommissionRateEvent,
 } from '@subql/contract-sdk/typechain/Staking';
 import assert from 'assert';
-import { Delegation, Withdrawl, Indexer } from '../types';
 import FrontierEthProvider from './ethProvider';
-import {
-  ERA_MANAGER_ADDRESS,
-  upsertEraValue,
-  updateIndexerChallenges,
-  updateTotalDelegation,
-  updateTotalStake,
-  updateDelegatorChallenges,
-} from './utils';
-import { BigNumber } from '@ethersproject/bignumber';
+import { updateIndexerChallenges, updateDelegatorChallenges } from './utils';
 import { FrontierEvmEvent } from '@subql/contract-processors/dist/frontierEvm';
-
-function getDelegationId(delegator: string, indexer: string): string {
-  return `${delegator}:${indexer}`;
-}
-
-function getWithdrawlId(delegator: string, index: BigNumber): string {
-  return `${delegator}:${index.toHexString()}`;
-}
+import { STAKING_ADDRESS } from './constants';
 
 export async function handleAddDelegation(
   event: FrontierEvmEvent<DelegationAddedEvent['args']>
@@ -37,64 +21,11 @@ export async function handleAddDelegation(
   logger.info('handleAddDelegation');
   assert(event.args, 'No event args');
 
-  const { source, indexer, amount } = event.args;
-  const id = getDelegationId(source, indexer);
-  const eraManager = EraManager__factory.connect(
-    ERA_MANAGER_ADDRESS,
-    new FrontierEthProvider()
-  );
-
-  const amountBn = amount.toBigInt();
-  let delegation = await Delegation.get(id);
-
-  await updateTotalDelegation(
-    eraManager,
-    source,
-    amountBn,
-    'add',
-    indexer === source && !delegation
-  );
-
-  if (!delegation) {
-    // Indexers first stake is effective immediately
-    const eraAmount = await upsertEraValue(
-      eraManager,
-      undefined,
-      amountBn,
-      'add',
-      indexer === source
-    );
-
-    delegation = Delegation.create({
-      id,
-      delegatorId: source,
-      indexerId: indexer,
-      amount: eraAmount,
-    });
-
-    await updateTotalStake(
-      eraManager,
-      indexer,
-      amountBn,
-      'add',
-      indexer === source
-    );
-  } else {
-    delegation.amount = await upsertEraValue(
-      eraManager,
-      delegation.amount,
-      amountBn
-    );
-
-    await updateTotalStake(eraManager, indexer, amountBn, 'add');
-  }
-
-  await delegation.save();
-
+  const { source, indexer } = event.args;
   if (source !== indexer) {
     await updateIndexerChallenges(
       indexer,
-      'ATTRACT_DELEGATOR',
+      'DELEGATOR_ATTRACTED',
       event.blockNumber,
       event.blockTimestamp
     );
@@ -107,64 +38,20 @@ export async function handleRemoveDelegation(
   logger.info('handleRemoveDelegation');
   assert(event.args, 'No event args');
 
-  const { source, indexer, amount } = event.args;
-  const id = getDelegationId(source, indexer);
-  const eraManager = EraManager__factory.connect(
-    ERA_MANAGER_ADDRESS,
-    new FrontierEthProvider()
-  );
+  const { source: delegator, indexer } = event.args;
 
-  const delegation = await Delegation.get(id);
-
-  // Entity has already been removed when indexer unregisters
-  if (!delegation) return;
-
-  delegation.amount = await upsertEraValue(
-    eraManager,
-    delegation.amount,
-    amount.toBigInt(),
-    'sub'
-  );
-
-  await updateTotalDelegation(eraManager, source, amount.toBigInt(), 'sub');
-  await updateTotalStake(eraManager, indexer, amount.toBigInt(), 'sub');
-
-  await delegation.save();
   await updateIndexerChallenges(
-    delegation.indexerId,
+    indexer,
     'INDEXER_UNDELEGATED',
     event.blockNumber,
     event.blockTimestamp
   );
   await updateDelegatorChallenges(
-    delegation.delegatorId,
-    'UNDELEGATE_INDEXER',
+    delegator,
+    'UNDELEGATE_FROM_INDEXER',
     event.blockNumber,
     event.blockTimestamp
   );
-}
-
-/* TODO wait for new contracts */
-export async function handleWithdrawRequested(
-  event: FrontierEvmEvent<UnbondRequestedEvent['args']>
-): Promise<void> {
-  logger.info('handleWithdrawRequested');
-  assert(event.args, 'No event args');
-
-  const { source, indexer, index, amount } = event.args;
-  const id = getWithdrawlId(source, index);
-
-  const withdrawl = Withdrawl.create({
-    id,
-    delegator: source,
-    indexer,
-    index: index.toBigInt(),
-    startTime: event.blockTimestamp,
-    amount: amount.toBigInt(),
-    claimed: false,
-  });
-
-  await withdrawl.save();
 }
 
 export async function handleWithdrawClaimed(
@@ -173,24 +60,19 @@ export async function handleWithdrawClaimed(
   logger.info('handleWithdrawClaimed');
   assert(event.args, 'No event args');
 
-  const { source, index } = event.args;
-  const id = getWithdrawlId(source, index);
+  const { source: delegator } = event.args;
 
-  const withdrawl = await Withdrawl.get(id);
-  assert(withdrawl, `Expected withdrawl (${id}) to exist`);
+  // FIXME: need to figure out how to get `indexer` address
+  // await updateIndexerChallenges(
+  //   withdrawl.indexer,
+  //   'WITHDRAW_CLAIMED',
+  //   event.blockNumber,
+  //   event.blockTimestamp
+  // );
 
-  withdrawl.claimed = true;
-
-  await withdrawl.save();
-  await updateIndexerChallenges(
-    withdrawl.indexer,
-    'WITHDRAW_CLAIMED',
-    event.blockNumber,
-    event.blockTimestamp
-  );
   await updateDelegatorChallenges(
-    withdrawl.delegator,
-    'WITHDRAW_CLAIMED',
+    delegator,
+    'WITHDRAW_DELEGATION',
     event.blockNumber,
     event.blockTimestamp
   );
@@ -202,51 +84,14 @@ export async function handleSetCommissionRate(
   logger.info('handleSetCommissionRate');
   assert(event.args, 'No event args');
 
-  const address = event.args.indexer;
-  const eraManager = EraManager__factory.connect(
-    ERA_MANAGER_ADDRESS,
-    new FrontierEthProvider()
-  );
+  const { indexer } = event.args;
+  const staking = Staking__factory.connect(STAKING_ADDRESS, new FrontierEthProvider());
+  const commissionRates = await staking.commissionRates(indexer);
+  const { valueAt, valueAfter } = commissionRates;
 
-  let indexer = await Indexer.get(address);
-
-  if (!indexer) {
-    indexer = Indexer.create({
-      id: address,
-      metadata: '',
-      totalStake: {
-        era: -1,
-        value: BigInt(0).toJSONType(),
-        valueAfter: BigInt(0).toJSONType(),
-      },
-      commission: {
-        era: -1,
-        value: BigInt(0).toJSONType(),
-        valueAfter: BigInt(0).toJSONType(),
-      },
-      singleChallengePts: 0,
-      singleChallenges: [],
-      demoProjectsIndexed: [],
-      active: true,
-    });
-  }
-
-  // assert(indexer, `Expected indexer (${address}) to exist`);
-
-  indexer.commission = await upsertEraValue(
-    eraManager,
-    indexer.commission,
-    event.args.amount.toBigInt(),
-    'replace',
-    // Apply instantly when era is -1, this is an indication that indexer has just registered
-    indexer.commission.era === -1
-  );
-
-  await indexer.save();
-
-  if (indexer.commission.value !== indexer.commission.valueAfter) {
+  if (valueAt !== valueAfter) {
     await updateIndexerChallenges(
-      indexer.id,
+      indexer,
       'CHANGE_COMMISSION',
       event.blockNumber,
       event.blockTimestamp
