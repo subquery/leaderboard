@@ -1,62 +1,18 @@
+// Copyright 2020-2022 SubQuery Pte Ltd authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+
 import bs58 from 'bs58';
 import { BigNumber } from '@ethersproject/bignumber';
 import { EraManager } from '@subql/contract-sdk';
 import { Delegator, Indexer, EraValue, JSONBigInt } from '../types';
 import testnetAddresses from '@subql/contract-sdk/publish/testnet.json';
-
-interface Challenge_Pts {
-  [key: string]: number;
-}
-interface Challenge_Details {
-  [key: string]: string;
-}
-
-export const SEASON_2_END = 340176;
-
-export const INDEXER_CHALLENGE_PTS: Challenge_Pts = {
-  INDEX_SINGLE: 10,
-  INDEX_ALL: 50,
-  ATTRACT_DELEGATOR: 20,
-  CHANGE_COMMISSION: 10,
-  DEFAULT_PLAN: 50,
-  OVERRIDE_PLAN: 50,
-  SERVICE_AGREEMENT: 50,
-  CLAIM_REWARD: 20,
-  WITHDRAW_CLAIMED: 50,
-  INDEXER_UNDELEGATED: 20,
-  UNREGISTER_INDEXER: 30,
-};
-
-export const INDEXER_CHALLENGE_DETAILS: Challenge_Details = {
-  INDEX_SINGLE: 'Fully index a project from demo projects list',
-  INDEX_ALL: 'Index all projects from demo projects list',
-  ATTRACT_DELEGATOR: 'Get your first delegator',
-  CHANGE_COMMISSION: 'Either increase of decrease commission rate',
-  DEFAULT_PLAN: 'Create a default plan',
-  OVERRIDE_PLAN: 'Create a override plan',
-  SERVICE_AGREEMENT: 'Get a service agreement from consumer',
-  CLAIM_REWARD: 'Indexer claims a reward',
-  WITHDRAW_CLAIMED: 'Delegator withdraws unstaked amount from indexer',
-  INDEXER_UNDELEGATED: 'Indexer gets delegation removed',
-  UNREGISTER_INDEXER: 'Unregister your indexer',
-};
-
-export const DELEGATOR_CHALLENGE_PTS: Challenge_Pts = {
-  CLAIM_REWARD: 20,
-  WITHDRAW_CLAIMED: 50,
-  UNDELEGATE_INDEXER: 50,
-};
-
-export const DELEGATOR_CHALLENGE_DETAILS: Challenge_Details = {
-  CLAIM_REWARD: 'Indexer claims a reward',
-  WITHDRAW_CLAIMED: 'Delegator withdraws unstaked amount from indexer',
-  UNDELEGATE_INDEXER: 'Delegator removed delegation to indexer',
-};
-
-export const DEMO_PROJECTS = [
-  'QmYR8xQgAXuCXMPGPVxxR91L4VtKZsozCM7Qsa5oAbyaQ3', //Staking Threshold - Polkadot
-  'QmSzPQ9f4U1GERvN1AxJ28xq9B5s4M72CPvotmmv1N2bN7', //Staking Threshold - Kusama
-];
+import {
+  SEASON_2_END,
+  INDEXER_CHALLENGE_PTS,
+  INDEXER_CHALLENGE_DETAILS,
+  DELEGATOR_CHALLENGE_PTS,
+  DELEGATOR_CHALLENGE_DETAILS,
+} from './constants';
 
 export const ERA_MANAGER_ADDRESS = testnetAddresses.EraManager.address;
 export const PLAN_MANAGER_ADDRESS = testnetAddresses.PlanManager.address;
